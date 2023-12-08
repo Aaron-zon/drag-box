@@ -9,22 +9,47 @@ const dragBox = () => {
   const mainDom = main.value;
   // 鼠标与物体边界距离
   boxDom.onmousedown = function (event) {
-    var tarX = 0;
-    var tarY = 0;
     // 鼠标距离窗口的XY轴0坐标的距离 box_dis
     var clientX = event.clientX
     var clientY = event.clientY
-    // box距离窗口XY轴的距离 box_2_doc_dis
-    tarX = boxDom.offsetLeft;
-    tarY = boxDom.offsetTop;
+    // box距离mainXY轴的距离 box_2_doc_dis
+    var tarX = boxDom.offsetLeft;
+    var tarY = boxDom.offsetTop;
+    // main距离窗口的距离
+    var mainX = mainDom.offsetLeft;
+    var mainY = mainDom.offsetTop;
+    // 鼠标距离box的距离 鼠标距离窗口的距离 - box距离main的距离 - main距离窗口的距离
+    var oldToBoxX = clientX - tarX - mainX;
+    var oldToBoxY = clientY - tarY - mainY;
 
-    mainDom.onmousemove = function (ev) {
+    document.onmousemove = function (ev) {
       // 用现在鼠标到窗口的距离 - 以前鼠标到窗口的距离 获得鼠标移动的距离  doc_dis - box_dis = traveled_dis
       // 用原来box到窗口的距离 + 鼠标移动的距离 得到当前box距离窗口的距离 box_2_doc_dis + traveled_dis
       var x = tarX + ev.clientX - clientX;
       var y = tarY + ev.clientY - clientY;
       var maxX = mainDom.offsetWidth - boxDom.offsetWidth;
       var maxY = mainDom.offsetHeight - boxDom.offsetHeight;
+      // console.log('xas:', x)
+
+      console.log(y, '--1', oldToBoxY, y == - oldToBoxY)
+      if (x <= - oldToBoxX) {
+        // 鼠标在main以左
+        document.onmousemove = null;
+        document.onmouseup = null;
+      } else if (y <= - oldToBoxY) {
+        // 鼠标在main以上
+        document.onmousemove = null;
+        document.onmouseup = null;
+      } else if(ev.clientX >= mainX + mainDom.offsetWidth) {
+        // 鼠标在main以右
+        document.onmousemove = null;
+        document.onmouseup = null;
+      } else if (ev.clientY >= mainY + mainDom.offsetHeight) {
+        // 鼠标在main以下
+        document.onmousemove = null;
+        document.onmouseup = null;
+      }
+      
       // 将box限制在main内
       if (x >= maxX) {
         x = maxX;
@@ -41,10 +66,20 @@ const dragBox = () => {
       boxDom.style.top = y  + 'px';
     }
 
+    // document.onmousemove = function (ev) {
+    //   console.log(info.x)
+    //   if (info.x == - oldToBoxX) {
+    //     console.log('xasa');
+    //     mainDom.onmousemove = null;
+    //     mainDom.onmouseup = null;
+    //     document.onmousemove = null;
+    //   }
+    // }
+
     // 鼠标抬起 清除事件
-    mainDom.onmouseup = function (ev) {
-      mainDom.onmousemove = null;
-      mainDom.onmouseup = null;
+    document.onmouseup = function (ev) {
+      document.onmousemove = null;
+      document.onmouseup = null;
     }
   }
 }
